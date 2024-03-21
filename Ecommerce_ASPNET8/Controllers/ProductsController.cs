@@ -1,5 +1,6 @@
 ﻿using Ecommerce_ASPNET8.Data;
 using Ecommerce_ASPNET8.Models;
+using Ecommerce_ASPNET8.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,18 +9,32 @@ namespace Ecommerce_ASPNET8.Controllers
 	public class ProductsController : Controller
 	{
 		private readonly ProductContext _context;
+		private readonly CartService _cartService;
 
-		public ProductsController(ProductContext context)
+		public ProductsController(ProductContext context, CartService cartService)
 		{
 			_context = context;
+			this._cartService = cartService;
 		}
 
 		// GET: Products
 		public async Task<IActionResult> Index()
 		{
-			return _context.Products != null
-				? View(await _context.Products.ToListAsync())
-				: Problem("Entity set 'ProductContext.Products' is null");
+			var products = await _context.Products.ToListAsync();
+			var cart = _cartService.GetCart();
+			foreach (var item in cart.Items)
+			{
+				var product = products.FirstOrDefault(p => p.Id == item.Product.Id);
+				if (product != null)
+				{
+					product.Quantity = item.Quantity;
+				}
+			}
+
+			return View(products);
+			//return _context.Products != null
+			//	? View(await _context.Products.ToListAsync())
+			//	: Problem("Entity set 'ProductContext.Products' is null");
 		}
 
 		// GET: Products/Details/5

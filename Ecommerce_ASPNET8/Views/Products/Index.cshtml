@@ -23,6 +23,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -38,6 +41,9 @@
             <td>
                 @(Math.Round(product.Price,2))
             </td>
+            <td>
+                <input type="number" min="1" value="@(product.Quantity))" id="quantity-@product.Id" />
+            </td>
             <td align="center">
                 <button class="add-to-cart" data-product-id="@product.Id">
                     Add to Cart
@@ -48,3 +54,7 @@
 }
     </tbody>
 </table>
+<form asp-controller="Cart" asp-action="Index" method="get">
+    <button type="submit" class="btn btn-primary">Show Cart</button>
+</form>
+@section Scripts{<script src="~/js/Cart.js"></script>}

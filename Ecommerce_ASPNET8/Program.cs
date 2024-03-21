@@ -1,5 +1,6 @@
 using Ecommerce_ASPNET8.Data;
 using Ecommerce_ASPNET8.Models;
+using Ecommerce_ASPNET8.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_ASPNET8
@@ -15,6 +16,15 @@ namespace Ecommerce_ASPNET8
 			builder.Services.AddDbContext<ProductContext>(
 				options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+			builder.Services.AddHttpContextAccessor();
+
+			builder.Services.AddTransient<CartService>();
+			builder.Services.AddDistributedMemoryCache();
+			builder.Services.AddSession(options =>
+			{
+				options.Cookie.HttpOnly = true;
+				options.Cookie.IsEssential = true;
+			});
 
 			var app = builder.Build();
 
@@ -40,7 +50,7 @@ namespace Ecommerce_ASPNET8
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
-
+			app.UseSession();
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 
@@ -50,7 +60,7 @@ namespace Ecommerce_ASPNET8
 
 			app.MapControllerRoute(
 				name: "default",
-				pattern: "{controller=Home}/{action=Index}/{id?}");
+				pattern: "{controller=Products}/{action=Index}/{id?}");
 
 			app.Run();
 		}
